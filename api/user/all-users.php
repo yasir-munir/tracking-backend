@@ -37,7 +37,7 @@ ParseClient::setServerURL("http://" . $serverIP . ":" . $port . "/", 'parse');
 function authenticateRequest($token) {
     $headers = getallheaders();
     if (!isset($headers['API-Key'])) {
-        throw new Exception('Access Key is missing');
+        throw new Exception('Access key is missing');
     }
     
     $apiKey = $headers['API-Key']; // Assuming API key is passed in the header
@@ -107,14 +107,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     if (!(empty($data))) {
         http_response_code(200);
-        echo json_encode(array("locations" => $data, "message" => "Data Found"));
+        echo json_encode(array("locations" => $data, "message" => "Data found"));
     } else {
         http_response_code(200);
         echo json_encode(array("message" => "No data found"));
     }
 } else {
     http_response_code(405);
-    echo json_encode(array("message" => "Method Not Allowed"));
+    echo json_encode(array("message" => "Method not allowed"));
 }
 
 // Check for valid API key or token
