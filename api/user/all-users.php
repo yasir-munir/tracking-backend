@@ -1,4 +1,4 @@
-<?php 
+<?php
 use Parse\ParseUser;
 
 ini_set('display_errors', 1);
@@ -9,6 +9,7 @@ error_reporting(E_ALL);
  */
 require_once '../../vendor/autoload.php';
 require_once '../../config/config.php';
+require_once '../../function/function.php';
 
 /**
  * Import the ParseClient class from the Parse namespace.
@@ -28,35 +29,17 @@ use Parse\ParseQuery;
 ParseClient::initialize($appID, null, $masterKey);
 ParseClient::setServerURL("http://" . $serverIP . ":" . $port . "/", 'parse');
 
-/**
- * authenticateRequest
- *
- * @param  mixed $token
- * @return void
- */
-function authenticateRequest($token) {
-    $headers = getallheaders();
-    if (!isset($headers['API-Key'])) {
-        throw new Exception('Access key is missing');
-    }
-    
-    $apiKey = $headers['API-Key']; // Assuming API key is passed in the header
-    // Check if the API key is valid
-    if ($apiKey !== $token) {
-        throw new Exception('Unauthorized');
-    }
-}
-    $query = new ParseQuery("_User");
-    $query->equalTo("is_active", true);
-    $query->equalTo("is_admin", true);
+$query = new ParseQuery("_User");
+$query->equalTo("is_active", true);
+$query->equalTo("is_admin", true);
 
-    // Retrieve all users
-    try {
-        $admin = $query->first(true);
-    } catch (ParseException $e) {
-        echo 'Error: ' . $e->getMessage();
-    }
-    $token = $admin->get("token");
+// Retrieve token value
+try {
+    $admin = $query->first(true);
+} catch (ParseException $e) {
+    echo 'Error: ' . $e->getMessage();
+}
+$token = $admin->get("token");
 
 // Authenticate the request
 try {
@@ -89,15 +72,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $objectId = $user->getObjectId();
         $username = $user->get("username");
         $driver_name = $user->get("driver_name");
-        $ping_time = $dateTime = date("d-m-Y H:i:s", ($user->get("ping_time")+18000));
+        $ping_time = $dateTime = date("d-m-Y H:i:s", ($user->get("ping_time") + 18000));
         $longitude = $user->get("longitude");
         $latitude = $user->get("latitude");
         $vehical_number = $user->get("vehical_number");
 
-        // Do something with the user data
+        // create the response of user data
         $response = [
             "driver_name" => $driver_name,
-            "ping_time" =>$ping_time,
+            "ping_time" => $ping_time,
             "latitude" => $latitude,
             "longitude" => $longitude,
             "vehical_number" => $vehical_number
@@ -105,6 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $data[] = $response;
     }
 
+    // generate response with data if any otherwise show data not found.
     if (!(empty($data))) {
         http_response_code(200);
         echo json_encode(array("locations" => $data, "message" => "Data found"));
@@ -116,8 +100,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     http_response_code(405);
     echo json_encode(array("message" => "Method not allowed"));
 }
-
-// Check for valid API key or token
 
 
 ?>
