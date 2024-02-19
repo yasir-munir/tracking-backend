@@ -29,3 +29,4 @@ npm run dev
 
 - GET api/users/all-locations
 - POST api/users/update-location
+- GET api/users/get-history
